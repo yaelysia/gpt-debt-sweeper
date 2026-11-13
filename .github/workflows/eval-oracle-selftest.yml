@@ -1,0 +1,49 @@
+name: Evaluation oracle self-test
+
+on:
+  push:
+    branches:
+      - 'eval/oracle'
+
+permissions:
+  contents: read
+
+jobs:
+  baseline-oracle:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - case: '01'
+            ref: 'eval/01-retired-ui'
+          - case: '02'
+            ref: 'eval/02-verification-theater'
+          - case: '03'
+            ref: 'eval/03-speculative-layers'
+          - case: '04'
+            ref: 'eval/04-dynamic-plugin-boundary'
+    steps:
+      - name: Checkout independent oracle
+        uses: actions/checkout@v4
+        with:
+          path: oracle
+      - name: Checkout untouched case baseline
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref }}
+          path: candidate
+      - name: Validate expected negative control
+        env:
+          CASE_ID: ${{ matrix.case }}
+        run: |
+          python -m py_compile oracle/judge.py
+          set +e
+          python oracle/judge.py "$CASE_ID" candidate > result.txt 2>&1
+          code=$?
+          set -e
+          cat result.txt
+          test "$code" -eq 1
+          grep -q '^PASS independent behavioral probe$' result.txt
+          grep -q '^PASS remaining project unit tests$' result.txt
+          grep -q '^FAIL removed:' result.txt
