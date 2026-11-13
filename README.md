@@ -58,12 +58,12 @@ $gpt-debt-sweeper 清理当前仓库里 GPT 留下的历史技术债，重点处
 
 为比较启用与不启用 Skill 的清理效果，仓库另设四个互不影响的初始测试分支：
 
-- [01 旧 UI 与打包残留](../../tree/eval/01-retired-ui)
-- [02 自我证明的验证膨胀](../../tree/eval/02-verification-theater)
-- [03 单实现抽象层膨胀](../../tree/eval/03-speculative-layers)
-- [04 动态插件与误删边界](../../tree/eval/04-dynamic-plugin-boundary)
+- [01 旧 UI 与打包残留](https://github.com/yaelysia/gpt-debt-sweeper/tree/eval/01-retired-ui)
+- [02 自我证明的验证膨胀](https://github.com/yaelysia/gpt-debt-sweeper/tree/eval/02-verification-theater)
+- [03 单实现抽象层膨胀](https://github.com/yaelysia/gpt-debt-sweeper/tree/eval/03-speculative-layers)
+- [04 动态插件与误删边界](https://github.com/yaelysia/gpt-debt-sweeper/tree/eval/04-dynamic-plugin-boundary)
 
-[独立评分器和操作说明](../../tree/eval/oracle) 位于 `eval/oracle` 分支。每个案例的原始功能测试应通过，但尚未完成清理；评分器将分别检查真实行为、残留和误删。测试案例分支保持原样，通过全新工作树进行对照，不要直接在案例基线分支上提交清理结果。
+[独立评分器和操作说明](https://github.com/yaelysia/gpt-debt-sweeper/tree/eval/oracle) 位于 `eval/oracle` 分支。每个案例的原始功能测试应通过，但尚未完成清理；评分器将分别检查真实行为、残留和误删。测试案例分支保持原样，通过全新工作树进行对照，不要直接在案例基线分支上提交清理结果。
 
 ## 状态
 
