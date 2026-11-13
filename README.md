@@ -14,13 +14,20 @@
 
 ## 安装与调用
 
-将**整个仓库**放到支持 SKILL.md 的 Agent 技能目录中，保留根目录的 SKILL.md 与 references 目录。例如 Codex 的常见用户级目录：
+推荐通过 [Skills CLI](https://github.com/vercel-labs/skills) 安装，工具会识别仓库根目录的 `SKILL.md` 并保留 `references/` 规则文件：
 
-```powershell
-git clone https://github.com/yaelysia/gpt-debt-sweeper.git "$HOME/.agents/skills/gpt-debt-sweeper"
+```bash
+# 交互式安装（选择目标 Agent）
+npx skills add yaelysia/gpt-debt-sweeper
+
+# 全局安装到 Codex，适用于所有项目
+npx skills add yaelysia/gpt-debt-sweeper -g -a codex -y
+
+# 仅列出仓库中可安装的 Skill，不安装
+npx skills add yaelysia/gpt-debt-sweeper --list
 ```
 
-仓库目前为私有仓库，克隆需要具有 GitHub 访问权限。其他 Agent 可按自身约定安装；只复制 SKILL.md 会缺失参考规则。
+也可以手动克隆到 Agent 支持的技能目录（如 Codex 的 `~/.agents/skills/gpt-debt-sweeper`）；只复制 `SKILL.md` 会缺失引用的规则文件。
 
 在目标项目中可直接指定：
 
