@@ -1,61 +1,51 @@
-# gpt-debt-sweeper
+# gpt-debt-sweeper evaluation oracle
 
-清理 GPT / Codex 在持续 AI Coding 中积累的**结构性技术债**：旧实现残留、无依据兼容、测试膨胀、验证表演、投机抽象、重复状态与防御性代码堆积。
+This branch contains the **independent evaluator**, deliberately kept out of
+each case branch. The case branches are unmodified starting points for coding
+agents, not clean solutions. The oracle is public and designed for reproducible
+smoke comparisons, not for adversarial scoring.
 
-**这不是代码审计、风格格式化或“去 AI 味”工具。** 用户要求清理时，Skill 会在确认现行消费者和契约后直接执行修改，优先整组删除失效概念，再使用项目已有检查做必要验证。
+## Cases
 
-## v0.1 包含什么
+| ID | Branch | Main behavior to measure |
+| --- | --- | --- |
+| 01 | `eval/01-retired-ui` | Remove retired console, legacy test/smoke, packaging and config leftovers; keep the current UI |
+| 02 | `eval/02-verification-theater` | Remove same-process self-verification, its dedicated tests and fixtures; preserve invoice output |
+| 03 | `eval/03-speculative-layers` | Collapse no-value registry/interface/forwarder and their internal tests; preserve welcome output |
+| 04 | `eval/04-dynamic-plugin-boundary` | Keep a dynamically loaded status plugin, remove the orphaned legacy plugin and only its dedicated support |
 
-- [SKILL.md](SKILL.md)：执行流程、范围约束、清理优先原则和停止条件。
-- [references/patterns.md](references/patterns.md)：六组 GPT 习惯性技术债的识别信号、清理动作和误判边界。
-- [references/deletion-rules.md](references/deletion-rules.md)：消费者追踪、动态入口、循环验证、删除/保留判断和最小验证。
+## Trial procedure (run once without Skill and once with Skill)
 
-纯 Markdown Skill；**没有依赖、扫描脚本、评分器或自动生成的审计工件**。可使用 Agent 已有的 Git、搜索、编译及测试能力。
-
-## 安装与调用
-
-推荐通过 [Skills CLI](https://github.com/vercel-labs/skills) 安装，工具会识别仓库根目录的 `SKILL.md` 并保留 `references/` 规则文件：
+1. Create two fresh, separate checkouts from **the same case branch commit**.
+2. In each checkout give the agent the exact same task from `eval-case/README.md`, scoped to `eval-case/`.
+3. The control run **does not invoke** the Skill. The treatment run invokes `$gpt-debt-sweeper` and uses the current skill's `SKILL.md` + `references/`.
+4. Do not let the agent inspect this oracle branch before it finishes its edits. Keep the same model, reasoning budget, time/tool limits, and base commit across runs.
+5. In a separate checkout of this `eval/oracle` branch, evaluate the agent's results:
 
 ```bash
-# 交互式安装（选择目标 Agent）
-npx skills add yaelysia/gpt-debt-sweeper
-
-# 全局安装到 Codex，适用于所有项目
-npx skills add yaelysia/gpt-debt-sweeper -g -a codex -y
-
-# 仅列出仓库中可安装的 Skill，不安装
-npx skills add yaelysia/gpt-debt-sweeper --list
+python judge.py 01 /path/to/edited-case-01-checkout
+python judge.py 02 /path/to/edited-case-02-checkout
+python judge.py 03 /path/to/edited-case-03-checkout
+python judge.py 04 /path/to/edited-case-04-checkout
 ```
 
-也可以手动克隆到 Agent 支持的技能目录（如 Codex 的 `~/.agents/skills/gpt-debt-sweeper`）；只复制 `SKILL.md` 会缺失引用的规则文件。
+The evaluator runs **fresh independent runtime assertions**, original remaining
+tests, structural removal checks, and residual-reference checks. A test pass
+alone is not enough. An untouched case should pass its existing project tests
+but fail some cleanup checks (by design).
 
-在目标项目中可直接指定：
+Report both the score and the actual diff. Structural checks intentionally
+prefer complete removal of the seeded scaffolding; they are a reproducible
+proxy for these four scenarios, not a universal definition of technical debt.
 
-```text
-$gpt-debt-sweeper 清理当前仓库里 GPT 留下的历史技术债，重点处理废弃实现、兼容层及其专属测试。直接修改并验证。
-```
+## Interpreting outcomes
 
-只想先看候选时，明确写“仅审计，不修改”。未指定目录时按当前仓库处理；如果给出工作区/子目录，仅在该范围内修改。
+- Functional probe fails: behavior regression (hard failure).
+- Valid dynamic plugin deleted: behavior regression (hard failure).
+- Remaining obsolete artifacts: incomplete cleanup.
+- Replacing removed scaffolding with a new equivalent layer can game the
+  structural score; inspect the final diff for such new debt.
+- Baseline and treatment comparisons with one run each are directional only.
+  Repetition is needed before claiming a model-level improvement.
 
-## 清理边界
-
-- 删除前追踪生产调用、动态加载、配置/打包、对外 API、持久化和迁移约束；“没有 import”不是删除证据。
-- 自动清理不等于取消产品能力。仍被支持的公开/用户可见行为、数据兼容、安全与故障边界保留。
-- 不为删除制造新的 Adapter、Wrapper、重复测试、备份或审批流程。
-- 只运行与实际修改相关、已有且能区分正确性的检查；不要求每次进行全仓回归。
-- 如果没有足够证据删掉某处，跳过它，不把怀疑写成事实，也不因此停止其他高置信度清理。
-
-## 设计来源
-
-借鉴以下项目的**方法**，规则为本项目重新组织撰写，而非直接拼装原始文件：
-
-- [reclaim-code-entropy](https://github.com/Yevanchen/reclaim-code-entropy)：追踪真实消费者与整组清理。
-- [code-humanizer](https://github.com/LeonardNJU/code-humanizer)：AI 编码冗余模式。
-- [deslop-GPT](https://github.com/MrZoyo/deslop-GPT)：测试膨胀、互相证明的验证冗余。
-- [dead-code-cleanup](https://github.com/jerseycheese/agent-skills/tree/main/skills/dead-code-cleanup) / [test-reaper](https://github.com/jerseycheese/agent-skills/tree/main/skills/test-reaper)：死代码引用追踪与弱测试识别。
-
-## 状态
-
-v0.1：第一版规则已完成；**尚未在真实目标仓库执行清理验证**。优先检验三个行为：能整组删除已废弃实现；能清除无独立价值的验证与专属测试；能保留实际动态引用和有效外部契约。
-
-MIT License，见 [LICENSE](LICENSE)。
+The evaluator has only Python standard-library dependencies.
