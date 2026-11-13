@@ -54,6 +54,17 @@ $gpt-debt-sweeper 清理当前仓库里 GPT 留下的历史技术债，重点处
 - [deslop-GPT](https://github.com/MrZoyo/deslop-GPT)：测试膨胀、互相证明的验证冗余。
 - [dead-code-cleanup](https://github.com/jerseycheese/agent-skills/tree/main/skills/dead-code-cleanup) / [test-reaper](https://github.com/jerseycheese/agent-skills/tree/main/skills/test-reaper)：死代码引用追踪与弱测试识别。
 
+## 评测案例（实验分支）
+
+为比较启用与不启用 Skill 的清理效果，仓库另设四个互不影响的初始测试分支：
+
+- [01 旧 UI 与打包残留](../../tree/eval/01-retired-ui)
+- [02 自我证明的验证膨胀](../../tree/eval/02-verification-theater)
+- [03 单实现抽象层膨胀](../../tree/eval/03-speculative-layers)
+- [04 动态插件与误删边界](../../tree/eval/04-dynamic-plugin-boundary)
+
+[独立评分器和操作说明](../../tree/eval/oracle) 位于 `eval/oracle` 分支。每个案例的原始功能测试应通过，但尚未完成清理；评分器将分别检查真实行为、残留和误删。测试案例分支保持原样，通过全新工作树进行对照，不要直接在案例基线分支上提交清理结果。
+
 ## 状态
 
 v0.1：第一版规则已完成；**尚未在真实目标仓库执行清理验证**。优先检验三个行为：能整组删除已废弃实现；能清除无独立价值的验证与专属测试；能保留实际动态引用和有效外部契约。
