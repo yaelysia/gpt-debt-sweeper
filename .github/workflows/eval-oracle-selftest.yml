@@ -47,3 +47,36 @@ jobs:
           grep -q '^PASS independent behavioral probe$' result.txt
           grep -q '^PASS remaining project unit tests$' result.txt
           grep -q '^FAIL removed:' result.txt
+
+      - name: Validate known-good minimal cleanup (temporary runner only)
+        env:
+          CASE_ID: ${{ matrix.case }}
+        run: |
+          case "$CASE_ID" in
+            01)
+              rm -rf candidate/eval-case/ui/legacy
+              rm candidate/eval-case/scripts/legacy_smoke.py candidate/eval-case/tests/test_legacy_smoke.py
+              printf '%s\n' '{"window_entry":"ui/dist/index.html"}' > candidate/eval-case/window.json
+              printf '%s\n' 'ui/dist/index.html' > candidate/eval-case/package-files.txt
+              ;;
+            02)
+              rm candidate/eval-case/scripts/verify_receipt.py candidate/eval-case/fixtures/receipt_sample.txt candidate/eval-case/tests/test_receipts.py
+              cat > candidate/eval-case/reporting.py <<'PY'
+          def render_invoice(order):
+              total = sum(row["count"] * row["price"] for row in order["items"])
+              return f'{order["id"]}: {total} credits'
+          PY
+              ;;
+            03)
+              rm candidate/eval-case/notifications/{port,provider,registry,forwarder}.py
+              rm candidate/eval-case/notifications/settings.json candidate/eval-case/tests/test_registry.py
+              cat > candidate/eval-case/notifications/service.py <<'PY'
+          def send_welcome(user):
+              return f"TO:{user}|welcome"
+          PY
+              ;;
+            04)
+              rm candidate/eval-case/plugins/legacy.py candidate/eval-case/scripts/run_legacy.py candidate/eval-case/tests/test_old_diagnostic.py
+              ;;
+          esac
+          python oracle/judge.py "$CASE_ID" candidate
