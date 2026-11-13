@@ -1,0 +1,19 @@
+name: Evaluation fixture baseline
+
+on:
+  push:
+    branches:
+      - 'eval/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run fixture's existing unit tests
+        working-directory: eval-case
+        run: python -B -m unittest discover -s tests -v
