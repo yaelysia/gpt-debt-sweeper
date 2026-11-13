@@ -1,0 +1,4 @@
+ui/dist/index.html
+ui/legacy/index.html
+ui/legacy/renderer.py
+scripts/legacy_smoke.py
