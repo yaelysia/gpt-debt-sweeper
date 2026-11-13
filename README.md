@@ -38,6 +38,24 @@ Report both the score and the actual diff. Structural checks intentionally
 prefer complete removal of the seeded scaffolding; they are a reproducible
 proxy for these four scenarios, not a universal definition of technical debt.
 
+## Initial oracle self-test (2026-11-13)
+
+GitHub Actions ran both the **untouched negative control** and a
+**known-good cleanup applied only inside the CI runner** for each case:
+
+| Case | Untouched | Known-good temporary cleanup |
+| --- | ---: | ---: |
+| 01 | 5/13 | 13/13 |
+| 02 | 5/11 | 11/11 |
+| 03 | 6/14 | 14/14 |
+| 04 | 6/9 | 9/9 |
+
+All eight independent runtime probes and both sets of remaining unit tests
+passed. [View the successful self-test](https://github.com/yaelysia/gpt-debt-sweeper/actions/runs/43382034025).
+
+**These are oracle controls, NOT Codex-with-Skill vs Codex-without-Skill results.**
+No autonomous coding-agent A/B trials have been run yet.
+
 ## Interpreting outcomes
 
 - Functional probe fails: behavior regression (hard failure).
