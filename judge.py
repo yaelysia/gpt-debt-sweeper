@@ -54,6 +54,7 @@ assert checkout_preview({"id":"empty","items":[]}) == "empty: 0 credits"
         "branch": "eval/03-speculative-layers",
         "must_remove": [
             "notifications/port.py",
+            "notifications/provider.py",
             "notifications/registry.py",
             "notifications/forwarder.py",
             "notifications/settings.json",
